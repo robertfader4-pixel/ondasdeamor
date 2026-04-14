@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Глава 4 — Волны любви</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+  <div class="chapter-page">
+    <div class="chapter-header"><a href="../index.html">← На главную</a></div>
+    <article class="card chapter-hero">
+      <img src="../assets/img/cover.jpg" alt="Глава 4">
+    </article>
+    <article class="card chapter-body">
+      <div class="lead">роман «Волны любви»</div>
+      <h1>Глава 4</h1>
+      <div class="chapter-text">
+        <p><em>Страница подготовлена для следующей главы</em></p>
+        
+<p>Эта страница уже готова для будущей публикации.</p>
+<p>Сюда можно вставить текст новой главы без изменений в дизайне. Достаточно открыть HTML-файл и заменить содержимое блока с текстом.</p>
+
+      </div>
+    </article>
+  </div>
+
+  <div class="music-player">
+    <audio id="soundtrack" preload="none">
+      <source src="../assets/audio/soundtrack.mp3" type="audio/mpeg">
+    </audio>
+    <button class="music-toggle" type="button" onclick="toggleSoundtrack()">Послушать саундтрек "Волны любви"</button>
+  </div>
+
+  <script>
+    function toggleSoundtrack() {
+      const audio = document.getElementById('soundtrack');
+      const btn = document.querySelector('.music-toggle');
+      if (!audio) return;
+      if (audio.paused) {
+        audio.play().then(() => {
+          btn.textContent = 'Пауза';
+        }).catch(() => {
+          btn.textContent = 'Послушать саундтрек "Волны любви"';
+        });
+      } else {
+        audio.pause();
+        btn.textContent = 'Послушать саундтрек "Волны любви"';
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="900" fill="url(#bg)"/>
+  <rect x="55" y="55" width="1290" height="790" rx="26" fill="none" stroke="#cbd5e1" stroke-width="4" stroke-dasharray="14 14" opacity="0.75"/>
+  <text x="700" y="390" font-family="Georgia, serif" font-size="62" fill="#f8fafc" text-anchor="middle">Иллюстрация главы 2</text>
+  <text x="700" y="470" font-family="Arial, sans-serif" font-size="32" fill="#cbd5e1" text-anchor="middle">Замените файл своим изображением</text>
+  <text x="700" y="530" font-family="Arial, sans-serif" font-size="28" fill="#94a3b8" text-anchor="middle">assets/img/chapter2.svg → chapter2.jpg или .png</text>
+</svg>
