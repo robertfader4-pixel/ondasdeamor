@@ -210,29 +210,246 @@
     </footer>
   </main>
 
-  <div class="music-player">
-    <audio id="soundtrack" preload="none">
-      <source src="assets/audio/soundtrack.mp3" type="audio/mpeg">
-    </audio>
-    <button class="music-toggle" type="button" onclick="toggleSoundtrack()">Послушать саундтрек "Волны любви"</button>
+  <div class="music-launcher">
+    <button id="openSoundBtn" class="music-open-btn" type="button">Саундтрек</button>
+  </div>
+
+  <div id="soundModal" class="sound-modal" aria-hidden="true">
+    <div class="sound-modal-backdrop"></div>
+    <div id="soundModalCard" class="sound-modal-card">
+      <div id="soundModalDrag" class="sound-modal-top">
+        <div class="sound-modal-title">Послушать саундтрек «Волны любви»</div>
+        <button id="closeSoundBtn" class="sound-close" type="button" aria-label="Закрыть">×</button>
+      </div>
+
+      <div class="sound-controls">
+        <audio id="soundtrack" controls preload="metadata">
+          <source src="assets/audio/soundtrack.mp3" type="audio/mpeg">
+          <source src="assets/audio/soundtrack.wav" type="audio/wav">
+        </audio>
+
+        <div class="spectrum-wrap">
+          <canvas id="spectrumCanvas" class="spectrum-canvas"></canvas>
+        </div>
+
+        <p class="sound-hint">Окно можно перетащить. При закрытии музыка останавливается.</p>
+      </div>
+    </div>
   </div>
 
   <script>
-    function toggleSoundtrack() {
-      const audio = document.getElementById('soundtrack');
-      const btn = document.querySelector('.music-toggle');
-      if (!audio) return;
-      if (audio.paused) {
-        audio.play().then(() => {
-          btn.textContent = 'Пауза';
-        }).catch(() => {
-          btn.textContent = 'Послушать саундтрек "Волны любви"';
-        });
-      } else {
-        audio.pause();
-        btn.textContent = 'Послушать саундтрек "Волны любви"';
+  (function () {
+    const modal = document.getElementById("soundModal");
+    const card = document.getElementById("soundModalCard");
+    const dragHandle = document.getElementById("soundModalDrag");
+    const openBtn = document.getElementById("openSoundBtn");
+    const closeBtn = document.getElementById("closeSoundBtn");
+    const audio = document.getElementById("soundtrack");
+    const canvas = document.getElementById("spectrumCanvas");
+
+    if (!modal || !card || !dragHandle || !openBtn || !closeBtn || !audio || !canvas) {
+      return;
+    }
+
+    let audioCtx = null;
+    let analyser = null;
+    let source = null;
+    let animationId = null;
+
+    let isDragging = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
+    function ensureAudioGraph() {
+      if (analyser) return;
+
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+
+      audioCtx = new AudioContextClass();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.85;
+
+      source = audioCtx.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    }
+
+    function resizeCanvas() {
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.max(10, Math.floor(rect.width * ratio));
+      canvas.height = Math.max(10, Math.floor(rect.height * ratio));
+    }
+
+    function drawSpectrum() {
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      resizeCanvas();
+
+      const width = canvas.width;
+      const height = canvas.height;
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+      ctx.clearRect(0, 0, width, height);
+
+      const bg = ctx.createLinearGradient(0, 0, 0, height);
+      bg.addColorStop(0, "rgba(255,255,255,0.15)");
+      bg.addColorStop(1, "rgba(120,207,208,0.04)");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, width, height);
+
+      const bars = 26;
+      const gap = 4 * ratio;
+      const barWidth = (width - gap * (bars + 1)) / bars;
+
+      if (!analyser || audio.paused) {
+        const t = Date.now() / 700;
+        for (let i = 0; i < bars; i++) {
+          const value = 0.18 + 0.1 * Math.sin(t + i * 0.5);
+          const barHeight = Math.max(6 * ratio, value * (height * 0.65));
+          const x = gap + i * (barWidth + gap);
+          const y = height - barHeight - 6 * ratio;
+          ctx.fillStyle = "rgba(68, 226, 220, 0.22)";
+          ctx.fillRect(x, y, barWidth, barHeight);
+        }
+        animationId = requestAnimationFrame(drawSpectrum);
+        return;
+      }
+
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      analyser.getByteFrequencyData(dataArray);
+
+      const grad = ctx.createLinearGradient(0, 0, 0, height);
+      grad.addColorStop(0, "rgba(68, 226, 220, 0.95)");
+      grad.addColorStop(1, "rgba(63, 187, 195, 0.28)");
+      ctx.fillStyle = grad;
+
+      const step = Math.max(1, Math.floor(bufferLength / bars));
+
+      for (let i = 0; i < bars; i++) {
+        const value = dataArray[i * step] / 255;
+        const barHeight = Math.max(8 * ratio, value * (height * 0.80));
+        const x = gap + i * (barWidth + gap);
+        const y = height - barHeight - 6 * ratio;
+        ctx.fillRect(x, y, barWidth, barHeight);
+      }
+
+      animationId = requestAnimationFrame(drawSpectrum);
+    }
+
+    function openModal() {
+      modal.classList.add("active");
+      modal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeModal() {
+      modal.classList.remove("active");
+      modal.setAttribute("aria-hidden", "true");
+      audio.pause();
+      audio.currentTime = 0;
+    }
+
+    async function startPlayback() {
+      try {
+        ensureAudioGraph();
+
+        if (audioCtx && audioCtx.state === "suspended") {
+          await audioCtx.resume();
+        }
+
+        audio.muted = false;
+        audio.volume = 1;
+        await audio.play();
+      } catch (err) {
+        console.error("No se pudo reproducir el audio:", err);
       }
     }
+
+    openBtn.addEventListener("click", async function () {
+      openModal();
+      await startPlayback();
+      if (!animationId) {
+        drawSpectrum();
+      }
+    });
+
+    closeBtn.addEventListener("click", function () {
+      closeModal();
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && modal.classList.contains("active")) {
+        closeModal();
+      }
+    });
+
+    function startDrag(clientX, clientY) {
+      const rect = card.getBoundingClientRect();
+      isDragging = true;
+      dragOffsetX = clientX - rect.left;
+      dragOffsetY = clientY - rect.top;
+      card.style.left = rect.left + "px";
+      card.style.top = rect.top + "px";
+      card.style.right = "auto";
+      card.style.bottom = "auto";
+      card.style.position = "fixed";
+    }
+
+    function moveDrag(clientX, clientY) {
+      if (!isDragging) return;
+
+      const maxX = window.innerWidth - card.offsetWidth - 6;
+      const maxY = window.innerHeight - card.offsetHeight - 6;
+
+      let x = clientX - dragOffsetX;
+      let y = clientY - dragOffsetY;
+
+      x = Math.max(6, Math.min(maxX, x));
+      y = Math.max(6, Math.min(maxY, y));
+
+      card.style.left = x + "px";
+      card.style.top = y + "px";
+    }
+
+    function endDrag() {
+      isDragging = false;
+    }
+
+    dragHandle.addEventListener("mousedown", function (e) {
+      if (e.target.closest("#closeSoundBtn")) return;
+      startDrag(e.clientX, e.clientY);
+    });
+
+    window.addEventListener("mousemove", function (e) {
+      moveDrag(e.clientX, e.clientY);
+    });
+
+    window.addEventListener("mouseup", endDrag);
+
+    dragHandle.addEventListener("touchstart", function (e) {
+      const touch = e.touches[0];
+      if (!touch) return;
+      startDrag(touch.clientX, touch.clientY);
+    }, { passive: true });
+
+    window.addEventListener("touchmove", function (e) {
+      const touch = e.touches[0];
+      if (!touch) return;
+      moveDrag(touch.clientX, touch.clientY);
+    }, { passive: true });
+
+    window.addEventListener("touchend", endDrag);
+    window.addEventListener("resize", resizeCanvas);
+
+    resizeCanvas();
+    if (!animationId) {
+      drawSpectrum();
+    }
+  })();
   </script>
 
 </body>
