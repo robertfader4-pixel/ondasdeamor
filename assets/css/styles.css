@@ -455,3 +455,40 @@ em{color:#8a6f84}
   }
   .spectrum-canvas{height:74px !important}
 }
+
+
+/* --- cleanup / polish --- */
+.hero-copy {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-copy::after {
+  content: "";
+  position: absolute;
+  inset: auto -60px -60px auto;
+  width: 180px;
+  height: 180px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(144,120,255,0.10), rgba(144,120,255,0.00) 70%);
+  pointer-events: none;
+}
+
+.hero-note {
+  margin-top: 1rem;
+  color: rgba(235, 235, 245, 0.78);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.hero-actions {
+  flex-wrap: wrap;
+}
+
+.chapter-grid .chapter-card {
+  min-height: 100%;
+}
+
+.chapter-thumb img {
+  display: block;
+}
