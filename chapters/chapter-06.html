@@ -1,271 +1,66 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Глава 6 — Волны любви</title>
-  <link rel="stylesheet" href="../assets/css/styles.css">
+<meta charset="UTF-8">
+<title>Глава 6. Башня Элион — Волны любви</title>
+<link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 <body>
-  <div class="chapter-page">
-    <div class="chapter-header"><a href="../index.html">← На главную</a></div>
-    <article class="card chapter-hero">
-      <img src="../assets/img/cover.jpg" alt="Глава 6">
-    </article>
-    <article class="card chapter-body">
-      <div class="lead">роман «Волны любви»</div>
-      <h1>Глава 6</h1>
-      <div class="chapter-text">
-        <p><em>Страница подготовлена для следующей главы</em></p>
-        
-<p>Эта страница уже готова для будущей публикации.</p>
-<p>Сюда можно вставить текст новой главы без изменений в дизайне. Достаточно открыть HTML-файл и заменить содержимое блока с текстом.</p>
+<div class="chapter-page">
+<div class="chapter-header"><a href="../index.html">← На главную</a></div>
 
-      </div>
-    </article>
-  </div>
+<article class="card chapter-hero">
+<img src="../assets/img/chapter-06.jpg" alt="Глава 6">
+</article>
 
-  <div class="music-launcher">
-    <button id="openSoundBtn" class="music-open-btn" type="button">Саундтрек</button>
-  </div>
+<article class="card chapter-body">
+<h1>Глава 6. Башня Элион</h1>
 
-  <div id="soundModal" class="sound-modal" aria-hidden="true">
-    <div class="sound-modal-backdrop"></div>
-    <div id="soundModalCard" class="sound-modal-card">
-      <div id="soundModalDrag" class="sound-modal-top">
-        <div class="sound-modal-title">Послушать саундтрек «Волны любви»</div>
-        <button id="closeSoundBtn" class="sound-close" type="button" aria-label="Закрыть">×</button>
-      </div>
+<p>Башня возвышалась над Синеей, словно точка, где сходятся все линии города.</p>
 
-      <div class="sound-controls">
-        <audio id="soundtrack" controls preload="metadata">
-          <source src="../assets/audio/soundtrack.mp3" type="audio/mpeg">
-          <source src="../assets/audio/soundtrack.wav" type="audio/wav">
-        </audio>
+<p>Снизу она казалась просто частью пейзажа — холодной, строгой, чужой. Но чем ближе они подходили, тем сильнее ощущалось: это не просто сооружение. В ней было напряжение. Присутствие. Почти сознание.</p>
 
-        <div class="spectrum-wrap">
-          <canvas id="spectrumCanvas" class="spectrum-canvas"></canvas>
-        </div>
+<p>Дождь вокруг неё становился другим.</p>
 
-        <p class="sound-hint">Окно можно перетащить. При закрытии музыка останавливается.</p>
-      </div>
-    </div>
-  </div>
+<p>Капли падали всё так же густо, но здесь в них чувствовалась тяжесть, будто каждая из них несла в себе усиленное эхо тех самых волн, о которых говорил лисёнок.</p>
 
-  <script>
-  (function () {
-    const modal = document.getElementById("soundModal");
-    const card = document.getElementById("soundModalCard");
-    const dragHandle = document.getElementById("soundModalDrag");
-    const openBtn = document.getElementById("openSoundBtn");
-    const closeBtn = document.getElementById("closeSoundBtn");
-    const audio = document.getElementById("soundtrack");
-    const canvas = document.getElementById("spectrumCanvas");
+<p>Наталья остановилась.</p>
 
-    if (!modal || !card || !dragHandle || !openBtn || !closeBtn || !audio || !canvas) {
-      return;
-    }
+<p>— Ты это чувствуешь?</p>
 
-    let audioCtx = null;
-    let analyser = null;
-    let source = null;
-    let animationId = null;
+<p>— Да, — ответил Луис. — Нас тянет внутрь.</p>
 
-    let isDragging = false;
-    let dragOffsetX = 0;
-    let dragOffsetY = 0;
+<p>Они вошли.</p>
 
-    function ensureAudioGraph() {
-      if (analyser) return;
+<p>Внутри было тихо. Но эта тишина давила.</p>
 
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) return;
+<p>— Источник наверху, — сказал лисёнок.</p>
 
-      audioCtx = new AudioContextClass();
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.85;
+<p>Они начали подниматься.</p>
 
-      source = audioCtx.createMediaElementSource(audio);
-      source.connect(analyser);
-      analyser.connect(audioCtx.destination);
-    }
+<p>С каждым шагом становилось тяжелее.</p>
 
-    function resizeCanvas() {
-      const ratio = Math.max(window.devicePixelRatio || 1, 1);
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = Math.max(10, Math.floor(rect.width * ratio));
-      canvas.height = Math.max(10, Math.floor(rect.height * ratio));
-    }
+<p>— Здесь что-то есть… — прошептала Наталья.</p>
 
-    function drawSpectrum() {
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+<p>— Мы рядом, — ответил Луис.</p>
 
-      resizeCanvas();
+<p>Наверху раздался звук.</p>
 
-      const width = canvas.width;
-      const height = canvas.height;
-      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+<p>— Он уже чувствует вас, — сказал лисёнок.</p>
 
-      ctx.clearRect(0, 0, width, height);
+<p>— Кто?</p>
 
-      const bg = ctx.createLinearGradient(0, 0, 0, height);
-      bg.addColorStop(0, "rgba(255,255,255,0.15)");
-      bg.addColorStop(1, "rgba(120,207,208,0.04)");
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, width, height);
+<p>— Тот, кто управляет волнами.</p>
 
-      const bars = 26;
-      const gap = 4 * ratio;
-      const barWidth = (width - gap * (bars + 1)) / bars;
+<p>Они дошли до двери.</p>
 
-      if (!analyser || audio.paused) {
-        const t = Date.now() / 700;
-        for (let i = 0; i < bars; i++) {
-          const value = 0.18 + 0.1 * Math.sin(t + i * 0.5);
-          const barHeight = Math.max(6 * ratio, value * (height * 0.65));
-          const x = gap + i * (barWidth + gap);
-          const y = height - barHeight - 6 * ratio;
-          ctx.fillStyle = "rgba(68, 226, 220, 0.22)";
-          ctx.fillRect(x, y, barWidth, barHeight);
-        }
-        animationId = requestAnimationFrame(drawSpectrum);
-        return;
-      }
+<p>— Готова?</p>
 
-      const bufferLength = analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
-      analyser.getByteFrequencyData(dataArray);
+<p>— Да.</p>
 
-      const grad = ctx.createLinearGradient(0, 0, 0, height);
-      grad.addColorStop(0, "rgba(68, 226, 220, 0.95)");
-      grad.addColorStop(1, "rgba(63, 187, 195, 0.28)");
-      ctx.fillStyle = grad;
+<p>Луис открыл дверь.</p>
 
-      const step = Math.max(1, Math.floor(bufferLength / bars));
-
-      for (let i = 0; i < bars; i++) {
-        const value = dataArray[i * step] / 255;
-        const barHeight = Math.max(8 * ratio, value * (height * 0.80));
-        const x = gap + i * (barWidth + gap);
-        const y = height - barHeight - 6 * ratio;
-        ctx.fillRect(x, y, barWidth, barHeight);
-      }
-
-      animationId = requestAnimationFrame(drawSpectrum);
-    }
-
-    function openModal() {
-      modal.classList.add("active");
-      modal.setAttribute("aria-hidden", "false");
-    }
-
-    function closeModal() {
-      modal.classList.remove("active");
-      modal.setAttribute("aria-hidden", "true");
-      audio.pause();
-      audio.currentTime = 0;
-    }
-
-    async function startPlayback() {
-      try {
-        ensureAudioGraph();
-
-        if (audioCtx && audioCtx.state === "suspended") {
-          await audioCtx.resume();
-        }
-
-        audio.muted = false;
-        audio.volume = 1;
-        await audio.play();
-      } catch (err) {
-        console.error("No se pudo reproducir el audio:", err);
-      }
-    }
-
-    openBtn.addEventListener("click", async function () {
-      openModal();
-      await startPlayback();
-      if (!animationId) {
-        drawSpectrum();
-      }
-    });
-
-    closeBtn.addEventListener("click", function () {
-      closeModal();
-    });
-
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && modal.classList.contains("active")) {
-        closeModal();
-      }
-    });
-
-    function startDrag(clientX, clientY) {
-      const rect = card.getBoundingClientRect();
-      isDragging = true;
-      dragOffsetX = clientX - rect.left;
-      dragOffsetY = clientY - rect.top;
-      card.style.left = rect.left + "px";
-      card.style.top = rect.top + "px";
-      card.style.right = "auto";
-      card.style.bottom = "auto";
-      card.style.position = "fixed";
-    }
-
-    function moveDrag(clientX, clientY) {
-      if (!isDragging) return;
-
-      const maxX = window.innerWidth - card.offsetWidth - 6;
-      const maxY = window.innerHeight - card.offsetHeight - 6;
-
-      let x = clientX - dragOffsetX;
-      let y = clientY - dragOffsetY;
-
-      x = Math.max(6, Math.min(maxX, x));
-      y = Math.max(6, Math.min(maxY, y));
-
-      card.style.left = x + "px";
-      card.style.top = y + "px";
-    }
-
-    function endDrag() {
-      isDragging = false;
-    }
-
-    dragHandle.addEventListener("mousedown", function (e) {
-      if (e.target.closest("#closeSoundBtn")) return;
-      startDrag(e.clientX, e.clientY);
-    });
-
-    window.addEventListener("mousemove", function (e) {
-      moveDrag(e.clientX, e.clientY);
-    });
-
-    window.addEventListener("mouseup", endDrag);
-
-    dragHandle.addEventListener("touchstart", function (e) {
-      const touch = e.touches[0];
-      if (!touch) return;
-      startDrag(touch.clientX, touch.clientY);
-    }, { passive: true });
-
-    window.addEventListener("touchmove", function (e) {
-      const touch = e.touches[0];
-      if (!touch) return;
-      moveDrag(touch.clientX, touch.clientY);
-    }, { passive: true });
-
-    window.addEventListener("touchend", endDrag);
-    window.addEventListener("resize", resizeCanvas);
-
-    resizeCanvas();
-    if (!animationId) {
-      drawSpectrum();
-    }
-  })();
-  </script>
-
+</article>
+</div>
 </body>
 </html>
