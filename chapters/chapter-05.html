@@ -9,14 +9,16 @@
 <body>
   <div class="chapter-page">
     <div class="chapter-header"><a href="../index.html">← На главную</a></div>
+
     <article class="card chapter-hero">
       <img src="../assets/img/chapter-05.jpg" alt="Глава 5">
     </article>
-    <article class="card chapter-body">
-  <div class="lead">роман «Волны любви»</div>
-  <h1>Глава 5. Прикосновение Натальи</h1>
-  <div class="chapter-text">
 
+    <article class="card chapter-body">
+      <div class="lead">роман «Волны любви»</div>
+      <h1>Глава 5. Прикосновение Натальи</h1>
+
+      <div class="chapter-text">
         <p>Их было четверо.</p>
 
         <p>Крупные, напряжённые, с искажёнными от ярости лицами. В их взглядах не было растерянности — только холодная, направленная агрессия. Они не походили на обычных людей, которых захватил странный дождь. В них ощущалось нечто иное — более сосредоточенное, почти осознанное, словно они были затронуты волнами сильнее других.</p>
@@ -153,13 +155,12 @@
 
         <p>Навстречу тому, что уже нельзя было остановить.</p>
       </div>
-    
-<div class="chapter-nav">
-  <a class="button secondary" href="chapter-04.html">← Предыдущая глава</a>
-  <a class="button primary" href="chapter-06.html">Следующая глава →</a>
-</div>
 
-</article>
+      <div class="chapter-nav">
+        <a class="button secondary" href="chapter-04.html">← Предыдущая глава</a>
+        <a class="button primary" href="chapter-06.html">Следующая глава →</a>
+      </div>
+    </article>
   </div>
 
   <div class="music-launcher">
@@ -176,28 +177,27 @@
 
       <div class="sound-controls">
         <div class="playlist-block">
-        <audio id="soundtrack" controls preload="metadata"></audio>
+          <audio id="soundtrack" controls preload="metadata"></audio>
 
-        <div class="playlist-ui">
-          <div class="playlist-label">Список воспроизведения</div>
-          <div class="playlist-items" id="playlistItems">
-            <button class="playlist-item active" type="button" data-src="../assets/audio/soundtrack.mp3" data-fallback="../assets/audio/soundtrack.wav">Основной саундтрек</button>
-            <button class="playlist-item" type="button" data-src="../assets/audio/la-lluvia.mp3">La lluvia</button>
+          <div class="playlist-ui">
+            <div class="playlist-label">Список воспроизведения</div>
+            <div class="playlist-items" id="playlistItems">
+              <button class="playlist-item active" type="button" data-src="../assets/audio/soundtrack.mp3" data-fallback="../assets/audio/soundtrack.wav">Волны любви</button>
+              <button class="playlist-item" type="button" data-src="../assets/audio/la-lluvia.mp3">Дождь</button>
+            </div>
           </div>
         </div>
-      </div>
 
         <div class="spectrum-wrap">
           <canvas id="spectrumCanvas" class="spectrum-canvas"></canvas>
         </div>
 
-        <p class="sound-hint">Окно можно перетащить. Окно можно перетащить. Плеер запоминает дорожку и позицию между страницами.</p>
+        <p class="sound-hint">Окно можно перетащить. Плеер запоминает дорожку и позицию между страницами.</p>
       </div>
     </div>
   </div>
 
-  
-<script>
+  <script>
 (function () {
   const modal = document.getElementById("soundModal");
   const card = document.getElementById("soundModalCard");
@@ -547,7 +547,7 @@
 
   restoreState();
 })();
-</script>
+  </script>
 
 </body>
 </html>
