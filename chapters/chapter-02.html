@@ -26,7 +26,13 @@
 <p>Когда они отстранились, тишина стала ещё глубже. Они слышали своё дыхание, сердце, близость. Наталья первой заговорила: «Луис… посмотри». Её голос дрожал — не от страха, а от того, что происходящее было слишком настоящим. Он проследил за её взглядом. Рисунок. Лис. Линия его спины начала светиться — сначала едва заметно, потом ярче, золотым, тёплым светом. Бумага чуть дрогнула, как будто внутри неё появилось движение. Чернила перестали быть просто линиями: они становились объёмными, живыми.</p>
 <p>И вдруг лис вышел из рисунка. Он мягко приземлился на стол, словно всегда принадлежал этому миру, спокойно взмахнул хвостом и посмотрел на них — без удивления, без суеты, как будто всё происходящее было естественным. Его глаза светились янтарным светом — тёплым, глубоким, старинным. Наталья прижала руку к груди. Луис не мог произнести ни слова. И тогда лис заговорил. Спокойно, чётко, как будто его голос всегда был рядом: «Я здесь, чтобы помочь вам спасти город».</p>
       </div>
-    </article>
+    
+<div class="chapter-nav">
+  <a class="button secondary" href="chapter-01.html">← Предыдущая глава</a>
+  <a class="button primary" href="chapter-03.html">Следующая глава →</a>
+</div>
+
+</article>
   </div>
 
   <div class="music-launcher">
@@ -58,267 +64,364 @@
           <canvas id="spectrumCanvas" class="spectrum-canvas"></canvas>
         </div>
 
-        <p class="sound-hint">Окно можно перетащить. При закрытии музыка останавливается.</p>
+        <p class="sound-hint">Окно можно перетащить. Окно можно перетащить. Плеер запоминает дорожку и позицию между страницами.</p>
       </div>
     </div>
   </div>
 
-  <script>
-  (function () {
-    const modal = document.getElementById("soundModal");
-    const card = document.getElementById("soundModalCard");
-    const dragHandle = document.getElementById("soundModalDrag");
-    const openBtn = document.getElementById("openSoundBtn");
-    const closeBtn = document.getElementById("closeSoundBtn");
-    const audio = document.getElementById("soundtrack");
-    const canvas = document.getElementById("spectrumCanvas");
-    const playlistItems = Array.from(document.querySelectorAll(".playlist-item"));
+  
+<script>
+(function () {
+  const modal = document.getElementById("soundModal");
+  const card = document.getElementById("soundModalCard");
+  const dragHandle = document.getElementById("soundModalDrag");
+  const openBtn = document.getElementById("openSoundBtn");
+  const closeBtn = document.getElementById("closeSoundBtn");
+  const audio = document.getElementById("soundtrack");
+  const canvas = document.getElementById("spectrumCanvas");
+  const playlistItems = Array.from(document.querySelectorAll(".playlist-item"));
+  const STORAGE_KEY = "waves_of_love_player_state_v2";
 
-    if (!modal || !card || !dragHandle || !openBtn || !closeBtn || !audio || !canvas || !playlistItems.length) {
+  if (!modal || !card || !dragHandle || !openBtn || !closeBtn || !audio || !canvas || !playlistItems.length) {
+    return;
+  }
+
+  let audioCtx = null;
+  let analyser = null;
+  let source = null;
+  let animationId = null;
+
+  let isDragging = false;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+
+  function normalizeTrack(src) {
+    if (!src) return "";
+    return src.split("/").pop().toLowerCase();
+  }
+
+  function getCurrentState() {
+    const activeButton = playlistItems.find((item) => item.classList.contains("active")) || playlistItems[0];
+    return {
+      trackKey: normalizeTrack(activeButton ? activeButton.getAttribute("data-src") : ""),
+      currentTime: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
+      isPlaying: !audio.paused,
+      isOpen: modal.classList.contains("active"),
+      left: card.style.left || "",
+      top: card.style.top || "",
+      right: card.style.right || "",
+      bottom: card.style.bottom || ""
+    };
+  }
+
+  function saveState(extra) {
+    try {
+      const state = Object.assign({}, getCurrentState(), extra || {});
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (err) {
+      console.warn("No se pudo guardar el estado del reproductor.", err);
+    }
+  }
+
+  function loadState() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function ensureAudioGraph() {
+    if (analyser) return;
+
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+
+    audioCtx = new AudioContextClass();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    analyser.smoothingTimeConstant = 0.85;
+
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+
+  function resizeCanvas() {
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.max(10, Math.floor(rect.width * ratio));
+    canvas.height = Math.max(10, Math.floor(rect.height * ratio));
+  }
+
+  function drawSpectrum() {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    resizeCanvas();
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+
+    ctx.clearRect(0, 0, width, height);
+
+    const bg = ctx.createLinearGradient(0, 0, 0, height);
+    bg.addColorStop(0, "rgba(255,255,255,0.22)");
+    bg.addColorStop(1, "rgba(120,207,208,0.06)");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, width, height);
+
+    const bars = 26;
+    const gap = 4 * ratio;
+    const barWidth = (width - gap * (bars + 1)) / bars;
+
+    if (!analyser || audio.paused) {
+      const t = Date.now() / 700;
+      for (let i = 0; i < bars; i++) {
+        const value = 0.18 + 0.1 * Math.sin(t + i * 0.5);
+        const barHeight = Math.max(6 * ratio, value * (height * 0.65));
+        const x = gap + i * (barWidth + gap);
+        const y = height - barHeight - 6 * ratio;
+        ctx.fillStyle = "rgba(68, 226, 220, 0.26)";
+        ctx.fillRect(x, y, barWidth, barHeight);
+      }
+      animationId = requestAnimationFrame(drawSpectrum);
       return;
     }
 
-    let audioCtx = null;
-    let analyser = null;
-    let source = null;
-    let animationId = null;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    analyser.getByteFrequencyData(dataArray);
 
-    let isDragging = false;
-    let dragOffsetX = 0;
-    let dragOffsetY = 0;
+    const grad = ctx.createLinearGradient(0, 0, 0, height);
+    grad.addColorStop(0, "rgba(68, 226, 220, 0.95)");
+    grad.addColorStop(1, "rgba(63, 187, 195, 0.28)");
+    ctx.fillStyle = grad;
 
+    const step = Math.max(1, Math.floor(bufferLength / bars));
 
-    function setActiveTrack(button, autoplay = false) {
-      if (!button) return;
-      const src = button.getAttribute("data-src");
-      const fallback = button.getAttribute("data-fallback");
-
-      playlistItems.forEach((item) => item.classList.remove("active"));
-      button.classList.add("active");
-
-      audio.pause();
-      audio.removeAttribute("src");
-      while (audio.firstChild) audio.removeChild(audio.firstChild);
-
-      const primarySource = document.createElement("source");
-      primarySource.src = src;
-      primarySource.type = "audio/mpeg";
-      audio.appendChild(primarySource);
-
-      if (fallback) {
-        const fallbackSource = document.createElement("source");
-        fallbackSource.src = fallback;
-        fallbackSource.type = "audio/wav";
-        audio.appendChild(fallbackSource);
-      }
-
-      audio.load();
-
-      if (autoplay) {
-        startPlayback();
-      }
+    for (let i = 0; i < bars; i++) {
+      const value = dataArray[i * step] / 255;
+      const barHeight = Math.max(8 * ratio, value * (height * 0.80));
+      const x = gap + i * (barWidth + gap);
+      const y = height - barHeight - 6 * ratio;
+      ctx.fillRect(x, y, barWidth, barHeight);
     }
 
-    playlistItems.forEach((button) => {
-      button.addEventListener("click", function () {
-        const shouldAutoplay = modal.classList.contains("active");
-        setActiveTrack(button, shouldAutoplay);
+    animationId = requestAnimationFrame(drawSpectrum);
+  }
+
+  function setActiveTrack(button, autoplay = false, resumeTime = null) {
+    if (!button) return;
+    const src = button.getAttribute("data-src");
+    const fallback = button.getAttribute("data-fallback");
+
+    playlistItems.forEach((item) => item.classList.remove("active"));
+    button.classList.add("active");
+
+    audio.pause();
+    while (audio.firstChild) audio.removeChild(audio.firstChild);
+
+    const primarySource = document.createElement("source");
+    primarySource.src = src;
+    primarySource.type = "audio/mpeg";
+    audio.appendChild(primarySource);
+
+    if (fallback) {
+      const fallbackSource = document.createElement("source");
+      fallbackSource.src = fallback;
+      fallbackSource.type = "audio/wav";
+      audio.appendChild(fallbackSource);
+    }
+
+    audio.load();
+
+    if (resumeTime !== null && resumeTime !== undefined) {
+      audio.addEventListener("loadedmetadata", function restoreTime() {
+        try {
+          audio.currentTime = Math.max(0, Math.min(resumeTime, isFinite(audio.duration) ? audio.duration || resumeTime : resumeTime));
+        } catch (err) {}
+        audio.removeEventListener("loadedmetadata", restoreTime);
       });
+    }
+
+    saveState({ trackKey: normalizeTrack(src), currentTime: resumeTime || 0 });
+
+    if (autoplay) {
+      startPlayback();
+    }
+  }
+
+  playlistItems.forEach((button) => {
+    button.addEventListener("click", function () {
+      const shouldAutoplay = modal.classList.contains("active");
+      setActiveTrack(button, shouldAutoplay, 0);
     });
+  });
 
-    setActiveTrack(playlistItems[0], false);
+  async function startPlayback() {
+    try {
+      ensureAudioGraph();
 
-    function ensureAudioGraph() {
-      if (analyser) return;
-
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) return;
-
-      audioCtx = new AudioContextClass();
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.85;
-
-      source = audioCtx.createMediaElementSource(audio);
-      source.connect(analyser);
-      analyser.connect(audioCtx.destination);
-    }
-
-    function resizeCanvas() {
-      const ratio = Math.max(window.devicePixelRatio || 1, 1);
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = Math.max(10, Math.floor(rect.width * ratio));
-      canvas.height = Math.max(10, Math.floor(rect.height * ratio));
-    }
-
-    function drawSpectrum() {
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-
-      resizeCanvas();
-
-      const width = canvas.width;
-      const height = canvas.height;
-      const ratio = Math.max(window.devicePixelRatio || 1, 1);
-
-      ctx.clearRect(0, 0, width, height);
-
-      const bg = ctx.createLinearGradient(0, 0, 0, height);
-      bg.addColorStop(0, "rgba(255,255,255,0.15)");
-      bg.addColorStop(1, "rgba(120,207,208,0.04)");
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, width, height);
-
-      const bars = 26;
-      const gap = 4 * ratio;
-      const barWidth = (width - gap * (bars + 1)) / bars;
-
-      if (!analyser || audio.paused) {
-        const t = Date.now() / 700;
-        for (let i = 0; i < bars; i++) {
-          const value = 0.18 + 0.1 * Math.sin(t + i * 0.5);
-          const barHeight = Math.max(6 * ratio, value * (height * 0.65));
-          const x = gap + i * (barWidth + gap);
-          const y = height - barHeight - 6 * ratio;
-          ctx.fillStyle = "rgba(68, 226, 220, 0.22)";
-          ctx.fillRect(x, y, barWidth, barHeight);
-        }
-        animationId = requestAnimationFrame(drawSpectrum);
-        return;
+      if (audioCtx && audioCtx.state === "suspended") {
+        await audioCtx.resume();
       }
 
-      const bufferLength = analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
-      analyser.getByteFrequencyData(dataArray);
-
-      const grad = ctx.createLinearGradient(0, 0, 0, height);
-      grad.addColorStop(0, "rgba(68, 226, 220, 0.95)");
-      grad.addColorStop(1, "rgba(63, 187, 195, 0.28)");
-      ctx.fillStyle = grad;
-
-      const step = Math.max(1, Math.floor(bufferLength / bars));
-
-      for (let i = 0; i < bars; i++) {
-        const value = dataArray[i * step] / 255;
-        const barHeight = Math.max(8 * ratio, value * (height * 0.80));
-        const x = gap + i * (barWidth + gap);
-        const y = height - barHeight - 6 * ratio;
-        ctx.fillRect(x, y, barWidth, barHeight);
-      }
-
-      animationId = requestAnimationFrame(drawSpectrum);
+      audio.muted = false;
+      audio.volume = 1;
+      await audio.play();
+      saveState({ isPlaying: true });
+    } catch (err) {
+      console.warn("El navegador bloqueó la reanudación automática del audio.", err);
+      saveState({ isPlaying: false });
     }
+  }
 
-    function openModal() {
-      modal.classList.add("active");
-      modal.setAttribute("aria-hidden", "false");
-    }
+  function openModal() {
+    modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
+    saveState({ isOpen: true });
+  }
 
-    function closeModal() {
-      modal.classList.remove("active");
-      modal.setAttribute("aria-hidden", "true");
-      audio.pause();
-      audio.currentTime = 0;
-    }
+  function closeModal() {
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+    audio.pause();
+    audio.currentTime = 0;
+    saveState({ isOpen: false, isPlaying: false, currentTime: 0 });
+  }
 
-    async function startPlayback() {
-      try {
-        ensureAudioGraph();
-
-        if (audioCtx && audioCtx.state === "suspended") {
-          await audioCtx.resume();
-        }
-
-        audio.muted = false;
-        audio.volume = 1;
-        await audio.play();
-      } catch (err) {
-        console.error("No se pudo reproducir el audio:", err);
-      }
-    }
-
-    openBtn.addEventListener("click", async function () {
-      openModal();
-      await startPlayback();
-      if (!animationId) {
-        drawSpectrum();
-      }
-    });
-
-    closeBtn.addEventListener("click", function () {
-      closeModal();
-    });
-
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && modal.classList.contains("active")) {
-        closeModal();
-      }
-    });
-
-    function startDrag(clientX, clientY) {
-      const rect = card.getBoundingClientRect();
-      isDragging = true;
-      dragOffsetX = clientX - rect.left;
-      dragOffsetY = clientY - rect.top;
-      card.style.left = rect.left + "px";
-      card.style.top = rect.top + "px";
-      card.style.right = "auto";
-      card.style.bottom = "auto";
-      card.style.position = "fixed";
-    }
-
-    function moveDrag(clientX, clientY) {
-      if (!isDragging) return;
-
-      const maxX = window.innerWidth - card.offsetWidth - 6;
-      const maxY = window.innerHeight - card.offsetHeight - 6;
-
-      let x = clientX - dragOffsetX;
-      let y = clientY - dragOffsetY;
-
-      x = Math.max(6, Math.min(maxX, x));
-      y = Math.max(6, Math.min(maxY, y));
-
-      card.style.left = x + "px";
-      card.style.top = y + "px";
-    }
-
-    function endDrag() {
-      isDragging = false;
-    }
-
-    dragHandle.addEventListener("mousedown", function (e) {
-      if (e.target.closest("#closeSoundBtn")) return;
-      startDrag(e.clientX, e.clientY);
-    });
-
-    window.addEventListener("mousemove", function (e) {
-      moveDrag(e.clientX, e.clientY);
-    });
-
-    window.addEventListener("mouseup", endDrag);
-
-    dragHandle.addEventListener("touchstart", function (e) {
-      const touch = e.touches[0];
-      if (!touch) return;
-      startDrag(touch.clientX, touch.clientY);
-    }, { passive: true });
-
-    window.addEventListener("touchmove", function (e) {
-      const touch = e.touches[0];
-      if (!touch) return;
-      moveDrag(touch.clientX, touch.clientY);
-    }, { passive: true });
-
-    window.addEventListener("touchend", endDrag);
-    window.addEventListener("resize", resizeCanvas);
-
-    resizeCanvas();
+  openBtn.addEventListener("click", async function () {
+    openModal();
+    await startPlayback();
     if (!animationId) {
       drawSpectrum();
     }
-  })();
-  </script>
+  });
+
+  closeBtn.addEventListener("click", function () {
+    closeModal();
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && modal.classList.contains("active")) {
+      closeModal();
+    }
+  });
+
+  function startDrag(clientX, clientY) {
+    const rect = card.getBoundingClientRect();
+    isDragging = true;
+    dragOffsetX = clientX - rect.left;
+    dragOffsetY = clientY - rect.top;
+    card.style.left = rect.left + "px";
+    card.style.top = rect.top + "px";
+    card.style.right = "auto";
+    card.style.bottom = "auto";
+    card.style.position = "fixed";
+  }
+
+  function moveDrag(clientX, clientY) {
+    if (!isDragging) return;
+
+    const maxX = window.innerWidth - card.offsetWidth - 6;
+    const maxY = window.innerHeight - card.offsetHeight - 6;
+
+    let nextX = clientX - dragOffsetX;
+    let nextY = clientY - dragOffsetY;
+
+    nextX = Math.max(6, Math.min(nextX, maxX));
+    nextY = Math.max(6, Math.min(nextY, maxY));
+
+    card.style.left = nextX + "px";
+    card.style.top = nextY + "px";
+    saveState({ left: card.style.left, top: card.style.top, right: "auto", bottom: "auto" });
+  }
+
+  function stopDrag() {
+    isDragging = false;
+  }
+
+  dragHandle.addEventListener("mousedown", function (e) {
+    startDrag(e.clientX, e.clientY);
+  });
+
+  document.addEventListener("mousemove", function (e) {
+    moveDrag(e.clientX, e.clientY);
+  });
+
+  document.addEventListener("mouseup", stopDrag);
+
+  dragHandle.addEventListener("touchstart", function (e) {
+    const touch = e.touches[0];
+    if (!touch) return;
+    startDrag(touch.clientX, touch.clientY);
+  }, { passive: true });
+
+  document.addEventListener("touchmove", function (e) {
+    const touch = e.touches[0];
+    if (!touch) return;
+    moveDrag(touch.clientX, touch.clientY);
+  }, { passive: true });
+
+  document.addEventListener("touchend", stopDrag);
+
+  window.addEventListener("resize", function () {
+    if (animationId) resizeCanvas();
+  });
+
+  audio.addEventListener("timeupdate", function () {
+    saveState();
+  });
+
+  audio.addEventListener("pause", function () {
+    saveState({ isPlaying: false });
+  });
+
+  audio.addEventListener("play", function () {
+    saveState({ isPlaying: true });
+  });
+
+  window.addEventListener("beforeunload", function () {
+    saveState();
+  });
+
+  function restoreState() {
+    const state = loadState();
+    const defaultButton = playlistItems[0];
+    if (!state) {
+      setActiveTrack(defaultButton, false, 0);
+      return;
+    }
+
+    const match = playlistItems.find((button) => normalizeTrack(button.getAttribute("data-src")) === state.trackKey) || defaultButton;
+    setActiveTrack(match, false, state.currentTime || 0);
+
+    if (state.left || state.top) {
+      card.style.position = "fixed";
+      if (state.left) card.style.left = state.left;
+      if (state.top) card.style.top = state.top;
+      card.style.right = state.right || "auto";
+      card.style.bottom = state.bottom || "auto";
+    }
+
+    if (state.isOpen) {
+      openModal();
+      if (!animationId) drawSpectrum();
+    }
+
+    if (state.isPlaying) {
+      setTimeout(() => {
+        startPlayback();
+      }, 120);
+    }
+  }
+
+  restoreState();
+})();
+</script>
+
 
 </body>
 </html>
