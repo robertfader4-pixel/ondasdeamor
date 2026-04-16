@@ -43,10 +43,17 @@
       </div>
 
       <div class="sound-controls">
-        <audio id="soundtrack" controls preload="metadata">
-          <source src="../assets/audio/soundtrack.mp3" type="audio/mpeg">
-          <source src="../assets/audio/soundtrack.wav" type="audio/wav">
-        </audio>
+        <div class="playlist-block">
+        <audio id="soundtrack" controls preload="metadata"></audio>
+
+        <div class="playlist-ui">
+          <div class="playlist-label">Список воспроизведения</div>
+          <div class="playlist-items" id="playlistItems">
+            <button class="playlist-item active" type="button" data-src="../assets/audio/soundtrack.mp3" data-fallback="../assets/audio/soundtrack.wav">Основной саундтрек</button>
+            <button class="playlist-item" type="button" data-src="../assets/audio/la-lluvia.mp3">La lluvia</button>
+          </div>
+        </div>
+      </div>
 
         <div class="spectrum-wrap">
           <canvas id="spectrumCanvas" class="spectrum-canvas"></canvas>
@@ -66,8 +73,9 @@
     const closeBtn = document.getElementById("closeSoundBtn");
     const audio = document.getElementById("soundtrack");
     const canvas = document.getElementById("spectrumCanvas");
+    const playlistItems = Array.from(document.querySelectorAll(".playlist-item"));
 
-    if (!modal || !card || !dragHandle || !openBtn || !closeBtn || !audio || !canvas) {
+    if (!modal || !card || !dragHandle || !openBtn || !closeBtn || !audio || !canvas || !playlistItems.length) {
       return;
     }
 
@@ -79,6 +87,47 @@
     let isDragging = false;
     let dragOffsetX = 0;
     let dragOffsetY = 0;
+
+
+    function setActiveTrack(button, autoplay = false) {
+      if (!button) return;
+      const src = button.getAttribute("data-src");
+      const fallback = button.getAttribute("data-fallback");
+
+      playlistItems.forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+
+      audio.pause();
+      audio.removeAttribute("src");
+      while (audio.firstChild) audio.removeChild(audio.firstChild);
+
+      const primarySource = document.createElement("source");
+      primarySource.src = src;
+      primarySource.type = "audio/mpeg";
+      audio.appendChild(primarySource);
+
+      if (fallback) {
+        const fallbackSource = document.createElement("source");
+        fallbackSource.src = fallback;
+        fallbackSource.type = "audio/wav";
+        audio.appendChild(fallbackSource);
+      }
+
+      audio.load();
+
+      if (autoplay) {
+        startPlayback();
+      }
+    }
+
+    playlistItems.forEach((button) => {
+      button.addEventListener("click", function () {
+        const shouldAutoplay = modal.classList.contains("active");
+        setActiveTrack(button, shouldAutoplay);
+      });
+    });
+
+    setActiveTrack(playlistItems[0], false);
 
     function ensureAudioGraph() {
       if (analyser) return;

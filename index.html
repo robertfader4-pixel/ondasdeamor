@@ -23,7 +23,7 @@
         <h1>Волны любви</h1>
         <p>
           Художественный сайт для чтения романа онлайн. Здесь собраны главы, сведения об авторе,
-          визуальная атмосфера истории и глоссарий мира Синеи. Первые шесть глав уже доступны для чтения,
+          визуальная атмосфера истории и глоссарий мира Синеи. Первые восемь глав уже доступны для чтения,
           остальные страницы подготовлены для будущего наполнения.
         </p>
         <div class="hero-actions">
@@ -31,7 +31,6 @@
           <a class="button secondary" href="#author">Об авторе</a>
         </div>
         <div class="hero-note">Синея, дождь, лисёнок и первые шесть глав истории — в одном пространстве.</div>
-      
 </section>
 
       <aside class="card cover-card">
@@ -85,7 +84,6 @@
         </article>
 
       </div>
-    
 </section>
 
     <section class="section" id="chapters">
@@ -121,45 +119,48 @@
           </a>
 
           <a class="card chapter-card" href="chapters/chapter-05.html">
-            <div class="chapter-thumb"><img src="assets/img/chapter-05.png" alt="Глава 5"></div>
+            <div class="chapter-thumb"><img src="assets/img/chapter-05.jpg" alt="Глава 5"></div>
             <div class="chapter-status">доступно</div>
             <h3>Глава пятая</h3>
             <p>Прикосновение Натальи</p>
           </a>
 
           <a class="card chapter-card" href="chapters/chapter-06.html">
-            <div class="chapter-thumb"><img src="assets/img/chapter-06.png" alt="Глава 6"></div>
+            <div class="chapter-thumb"><img src="assets/img/chapter-06.jpg" alt="Глава 6"></div>
             <div class="chapter-status">доступно</div>
             <h3>Глава шестая</h3>
             <p>Башня Элион</p>
           </a>
 
           <a class="card chapter-card" href="chapters/chapter-07.html">
-            <div class="chapter-status">скоро</div>
+            <div class="chapter-thumb"><img src="assets/img/chapter-07.jpg" alt="Глава 7"></div>
+            <div class="chapter-status">доступно</div>
             <h3>Глава седьмая</h3>
-            <p>Страница уже создана и ждёт текст.</p>
+            <p>Источник</p>
           </a>
 
           <a class="card chapter-card" href="chapters/chapter-08.html">
-            <div class="chapter-status">скоро</div>
+            <div class="chapter-thumb"><img src="assets/img/chapter-08.jpg" alt="Глава 8"></div>
+            <div class="chapter-status">доступно</div>
             <h3>Глава восьмая</h3>
-            <p>Страница уже создана и ждёт текст.</p>
+            <p>Тишина после волн</p>
           </a>
 
           <a class="card chapter-card" href="chapters/chapter-09.html">
-            <div class="chapter-status">скоро</div>
+            <div class="chapter-thumb"><img src="assets/img/chapter-09.jpg" alt="Глава 9"></div>
+            <div class="chapter-status">доступно</div>
             <h3>Глава девятая</h3>
-            <p>Страница уже создана и ждёт текст.</p>
+            <p>Возвращение</p>
           </a>
 
           <a class="card chapter-card" href="chapters/chapter-10.html">
-            <div class="chapter-status">скоро</div>
+            <div class="chapter-thumb"><img src="assets/img/chapter-10.jpg" alt="Глава 10"></div>
+            <div class="chapter-status">доступно</div>
             <h3>Глава десятая</h3>
-            <p>Страница уже создана и ждёт текст.</p>
+            <p>Наш лис</p>
           </a>
         </div>
       </div>
-    
 </section>
 
     <section class="section" id="author">
@@ -170,7 +171,7 @@
         <div>
           <h2>Об авторе</h2>
           <p>
-            Luis Fader — автор романа «Волны любви». На этой странице собрана визуальная и текстовая
+            Роберт Фадер — автор романа «Волны любви». На этой странице собрана визуальная и текстовая
             презентация проекта, чтобы роман можно было читать как отдельный литературный сайт.
           </p>
           <p>
@@ -178,14 +179,13 @@
             датами публикации и новостями о новых главах.
           </p>
           <div class="meta">
-            <div><strong>Имя автора</strong><span>Luis Fader</span></div>
+            <div><strong>Имя автора</strong><span>Роберт Фадер</span></div>
             <div><strong>Формат</strong><span>Онлайн-роман</span></div>
             <div><strong>Мир истории</strong><span>Синея</span></div>
             <div><strong>Статус</strong><span>Публикация продолжается</span></div>
           </div>
         </div>
       </div>
-    
 </section>
 
     <section class="section" id="glossary">
@@ -212,7 +212,6 @@
           </li>
         </ul>
       </div>
-    
 </section>
 
     <footer class="footer">
@@ -233,10 +232,17 @@
       </div>
 
       <div class="sound-controls">
-        <audio id="soundtrack" controls preload="metadata">
-          <source src="assets/audio/soundtrack.mp3" type="audio/mpeg">
-          <source src="assets/audio/soundtrack.wav" type="audio/wav">
-        </audio>
+        <div class="playlist-block">
+        <audio id="soundtrack" controls preload="metadata"></audio>
+
+        <div class="playlist-ui">
+          <div class="playlist-label">Список воспроизведения</div>
+          <div class="playlist-items" id="playlistItems">
+            <button class="playlist-item active" type="button" data-src="assets/audio/soundtrack.mp3" data-fallback="assets/audio/soundtrack.wav">Основной саундтрек</button>
+            <button class="playlist-item" type="button" data-src="assets/audio/la-lluvia.mp3">La lluvia</button>
+          </div>
+        </div>
+      </div>
 
         <div class="spectrum-wrap">
           <canvas id="spectrumCanvas" class="spectrum-canvas"></canvas>
@@ -256,8 +262,9 @@
     const closeBtn = document.getElementById("closeSoundBtn");
     const audio = document.getElementById("soundtrack");
     const canvas = document.getElementById("spectrumCanvas");
+    const playlistItems = Array.from(document.querySelectorAll(".playlist-item"));
 
-    if (!modal || !card || !dragHandle || !openBtn || !closeBtn || !audio || !canvas) {
+    if (!modal || !card || !dragHandle || !openBtn || !closeBtn || !audio || !canvas || !playlistItems.length) {
       return;
     }
 
@@ -269,6 +276,47 @@
     let isDragging = false;
     let dragOffsetX = 0;
     let dragOffsetY = 0;
+
+
+    function setActiveTrack(button, autoplay = false) {
+      if (!button) return;
+      const src = button.getAttribute("data-src");
+      const fallback = button.getAttribute("data-fallback");
+
+      playlistItems.forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+
+      audio.pause();
+      audio.removeAttribute("src");
+      while (audio.firstChild) audio.removeChild(audio.firstChild);
+
+      const primarySource = document.createElement("source");
+      primarySource.src = src;
+      primarySource.type = "audio/mpeg";
+      audio.appendChild(primarySource);
+
+      if (fallback) {
+        const fallbackSource = document.createElement("source");
+        fallbackSource.src = fallback;
+        fallbackSource.type = "audio/wav";
+        audio.appendChild(fallbackSource);
+      }
+
+      audio.load();
+
+      if (autoplay) {
+        startPlayback();
+      }
+    }
+
+    playlistItems.forEach((button) => {
+      button.addEventListener("click", function () {
+        const shouldAutoplay = modal.classList.contains("active");
+        setActiveTrack(button, shouldAutoplay);
+      });
+    });
+
+    setActiveTrack(playlistItems[0], false);
 
     function ensureAudioGraph() {
       if (analyser) return;

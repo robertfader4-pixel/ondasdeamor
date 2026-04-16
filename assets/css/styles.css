@@ -492,3 +492,53 @@ em{color:#8a6f84}
 .chapter-thumb img {
   display: block;
 }
+
+
+
+.playlist-block{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.playlist-ui{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.playlist-label{
+  font-size:0.92rem;
+  color:rgba(239,239,248,0.78);
+}
+
+.playlist-items{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  max-height:180px;
+  overflow:auto;
+}
+
+.playlist-item{
+  width:100%;
+  text-align:left;
+  border:1px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.05);
+  color:#f8f5fb;
+  border-radius:14px;
+  padding:10px 12px;
+  cursor:pointer;
+  transition:transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.playlist-item:hover{
+  transform:translateY(-1px);
+  border-color:rgba(120,207,208,0.45);
+  background:rgba(120,207,208,0.10);
+}
+
+.playlist-item.active{
+  border-color:rgba(120,207,208,0.65);
+  background:rgba(120,207,208,0.18);
+}
