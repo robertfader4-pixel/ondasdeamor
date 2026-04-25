@@ -1,5 +1,5 @@
 (function(){
-const modal=document.getElementById('soundModal'),card=document.getElementById('soundModalCard'),drag=document.getElementById('soundModalDrag'),openBtn=document.getElementById('openSoundBtn'),closeBtn=document.getElementById('closeSoundBtn'),audio=document.getElementById('soundtrack'),canvas=document.getElementById('spectrumCanvas'),ray=document.getElementById('globalSpectrumCanvas'),items=[...document.querySelectorAll('.playlist-item')],KEY='waves_love_player_v6';
+const modal=document.getElementById('soundModal'),card=document.getElementById('soundModalCard'),drag=document.getElementById('soundModalDrag'),openBtn=document.getElementById('openSoundBtn'),closeBtn=document.getElementById('closeSoundBtn'),audio=document.getElementById('soundtrack'),canvas=document.getElementById('spectrumCanvas'),ray=document.getElementById('globalSpectrumCanvas'),items=[...document.querySelectorAll('.playlist-item')],KEY='waves_love_player_v7';
 if(!modal||!card||!drag||!openBtn||!closeBtn||!audio||!canvas||!items.length)return;
 let ac,an,src,raf,down=false,ox=0,oy=0;
 const norm=s=>(s||'').split('/').pop().toLowerCase();
@@ -14,9 +14,18 @@ function draw(c,kind){if(!c)return;const ctx=c.getContext('2d');resize(c);const 
 function loop(){draw(canvas,'panel');if(ray&&!audio.paused)draw(ray,'ray');raf=requestAnimationFrame(loop)}
 function start(){if(raf)cancelAnimationFrame(raf);raf=requestAnimationFrame(loop)}
 async function play(){try{graph();if(ac&&ac.state==='suspended')await ac.resume();await audio.play();ray&&ray.classList.add('is-playing');save({playing:true});start()}catch(e){save({playing:false})}}
-function open(){modal.classList.add('active');modal.setAttribute('aria-hidden','false');save({open:true});start()}function close(){modal.classList.remove('active');modal.setAttribute('aria-hidden','true');audio.pause();ray&&ray.classList.remove('is-playing');save({open:false,playing:false,time:audio.currentTime||0})}
-openBtn.addEventListener('click',()=>{open();if(audio.paused)play()});closeBtn.addEventListener('click',close);items.forEach(b=>b.addEventListener('click',()=>{setTrack(b,0,true);play()}));
-drag.addEventListener('pointerdown',e=>{down=true;card.setPointerCapture(e.pointerId);let r=card.getBoundingClientRect();ox=e.clientX-r.left;oy=e.clientY-r.top;card.style.right='auto';card.style.bottom='auto'});drag.addEventListener('pointermove',e=>{if(!down)return;let l=Math.min(Math.max(0,innerWidth-card.offsetWidth),Math.max(0,e.clientX-ox)),t=Math.min(Math.max(0,innerHeight-card.offsetHeight),Math.max(0,e.clientY-oy));card.style.left=l+'px';card.style.top=t+'px';save({left:card.style.left,top:card.style.top,right:'auto',bottom:'auto'})});function up(e){down=false;try{card.releasePointerCapture(e.pointerId)}catch(x){}}drag.addEventListener('pointerup',up);drag.addEventListener('pointercancel',up);
-audio.addEventListener('timeupdate',()=>save());audio.addEventListener('pause',()=>{ray&&ray.classList.remove('is-playing');save({playing:false})});audio.addEventListener('play',()=>{ray&&ray.classList.add('is-playing');save({playing:true});start()});addEventListener('resize',start);addEventListener('beforeunload',()=>save());
+function open(){modal.classList.add('active');modal.setAttribute('aria-hidden','false');save({open:true});start()}
+function close(){modal.classList.remove('active');modal.setAttribute('aria-hidden','true');audio.pause();ray&&ray.classList.remove('is-playing');save({open:false,playing:false,time:audio.currentTime||0})}
+openBtn.addEventListener('click',()=>{open();if(audio.paused)play()});
+closeBtn.addEventListener('click',close);
+items.forEach(b=>b.addEventListener('click',()=>{setTrack(b,0,true);play()}));
+drag.addEventListener('pointerdown',e=>{down=true;card.setPointerCapture(e.pointerId);let r=card.getBoundingClientRect();ox=e.clientX-r.left;oy=e.clientY-r.top;card.style.right='auto';card.style.bottom='auto'});
+drag.addEventListener('pointermove',e=>{if(!down)return;let l=Math.min(Math.max(0,innerWidth-card.offsetWidth),Math.max(0,e.clientX-ox)),t=Math.min(Math.max(0,innerHeight-card.offsetHeight),Math.max(0,e.clientY-oy));card.style.left=l+'px';card.style.top=t+'px';save({left:card.style.left,top:card.style.top,right:'auto',bottom:'auto'})});
+function up(e){down=false;try{card.releasePointerCapture(e.pointerId)}catch(x){}}
+drag.addEventListener('pointerup',up);drag.addEventListener('pointercancel',up);
+audio.addEventListener('timeupdate',()=>save());
+audio.addEventListener('pause',()=>{ray&&ray.classList.remove('is-playing');save({playing:false})});
+audio.addEventListener('play',()=>{ray&&ray.classList.add('is-playing');save({playing:true});start()});
+addEventListener('resize',start);addEventListener('beforeunload',()=>save());
 let st=state(),b=items[0];if(st&&st.track)b=items.find(i=>norm(i.dataset.src)===st.track)||b;setTrack(b,st&&st.time?st.time:0,false);if(st){if(st.left)card.style.left=st.left;if(st.top)card.style.top=st.top;if(st.right)card.style.right=st.right;if(st.bottom)card.style.bottom=st.bottom;if(st.open)open();if(st.playing)play()}
 })();

@@ -424,5 +424,41 @@
 </script>
 
 
+
+  <div class="music-launcher">
+    <button id="openSoundBtn" class="music-open-btn" type="button" aria-label="Послушать музыку">
+      <img src="../assets/img/fox-play.png" alt="Слушать музыку">
+    </button>
+  </div>
+
+  <canvas id="globalSpectrumCanvas" class="global-spectrum-canvas" aria-hidden="true"></canvas>
+
+  <div id="soundModal" class="sound-modal" aria-hidden="true">
+    <div class="sound-modal-backdrop"></div>
+    <div id="soundModalCard" class="sound-modal-card">
+      <div id="soundModalDrag" class="sound-modal-top">
+        <div class="sound-modal-title">Саундтрек «Волны любви»</div>
+        <button id="closeSoundBtn" class="sound-close" type="button" aria-label="Закрыть">×</button>
+      </div>
+      <div class="sound-controls">
+        <div class="playlist-block">
+          <audio id="soundtrack" controls preload="metadata"></audio>
+          <div class="playlist-ui">
+            <div class="playlist-label">Список воспроизведения</div>
+            <div class="playlist-items" id="playlistItems">
+              <button class="playlist-item active" type="button" data-src="../assets/audio/prikosnovenie-istiny.mp3">Прикосновение истины</button>
+              <button class="playlist-item" type="button" data-src="../assets/audio/soundtrack.mp3" data-fallback="../assets/audio/soundtrack.wav">Волны любви</button>
+              <button class="playlist-item" type="button" data-src="../assets/audio/la-lluvia.mp3">Дождь</button>
+            </div>
+          </div>
+          <canvas id="spectrumCanvas" aria-hidden="true"></canvas>
+        </div>
+        <p class="sound-hint">Нажмите на лиса, чтобы открыть музыку. При закрытии списка воспроизведение остановится.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/waves-player.js"></script>
+
 </body>
 </html>
