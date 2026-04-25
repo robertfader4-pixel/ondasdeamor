@@ -957,3 +957,107 @@ em{color:#8a6f84}
     height:68px !important;
   }
 }
+
+
+/* === Волны любви: minimizable playlist v8 === */
+.sound-minimize{
+  width:34px !important;
+  height:34px !important;
+  border-radius:12px !important;
+  border:1px solid rgba(255,183,91,.45) !important;
+  background:rgba(255,141,42,.11) !important;
+  color:#ffdfa2 !important;
+  font-size:1.15rem !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+  cursor:pointer !important;
+  margin-left:auto !important;
+}
+.sound-minimize:hover{
+  background:rgba(255,141,42,.24) !important;
+}
+.sound-mini-track{
+  display:none !important;
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  border:0 !important;
+  background:transparent !important;
+  color:#ffe2a7 !important;
+  font-family:Georgia, "Times New Roman", serif !important;
+  font-size:.92rem !important;
+  font-weight:800 !important;
+  text-align:left !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+  max-width:210px !important;
+  cursor:pointer !important;
+  text-shadow:0 0 12px rgba(255,145,43,.38) !important;
+}
+.sound-modal.minimized{
+  pointer-events:none !important;
+}
+.sound-modal.minimized .sound-modal-backdrop{
+  display:none !important;
+  pointer-events:none !important;
+  background:transparent !important;
+  backdrop-filter:none !important;
+}
+.sound-modal.minimized .sound-modal-card{
+  pointer-events:auto !important;
+  width:min(270px, calc(100vw - 24px)) !important;
+  right:18px !important;
+  bottom:96px !important;
+  left:auto !important;
+  top:auto !important;
+  padding:10px 12px !important;
+  border-radius:18px !important;
+  box-shadow:0 14px 42px rgba(30,9,3,.42), 0 0 24px rgba(255,114,24,.20) !important;
+}
+.sound-modal.minimized .sound-controls{
+  display:none !important;
+}
+.sound-modal.minimized .sound-modal-top{
+  margin:0 !important;
+  padding:0 !important;
+  border-bottom:0 !important;
+  cursor:default !important;
+}
+.sound-modal.minimized .sound-modal-title{
+  display:none !important;
+}
+.sound-modal.minimized .sound-mini-track{
+  display:block !important;
+}
+.sound-modal.minimized .sound-minimize{
+  display:none !important;
+}
+.sound-modal.minimized .sound-close{
+  width:30px !important;
+  height:30px !important;
+  min-width:30px !important;
+  border-radius:10px !important;
+  font-size:1rem !important;
+}
+.sound-modal.minimized .sound-modal-top::before{
+  content:"♫" !important;
+  color:#ffbf64 !important;
+  font-size:1.05rem !important;
+  margin-right:2px !important;
+  text-shadow:0 0 12px rgba(255,130,30,.72) !important;
+}
+@media (max-width:720px){
+  .sound-modal.minimized .sound-modal-card{
+    top:auto !important;
+    bottom:78px !important;
+    right:10px !important;
+    left:auto !important;
+    width:min(250px, calc(100vw - 20px)) !important;
+    max-height:none !important;
+    overflow:hidden !important;
+  }
+  .sound-mini-track{
+    max-width:175px !important;
+    font-size:.86rem !important;
+  }
+}
