@@ -76,5 +76,38 @@
     </article>
   </div>
 
+
+  <div class="music-launcher">
+    <button id="openSoundBtn" class="music-open-btn" type="button">Саундтрек</button>
+  </div>
+
+  <div id="soundModal" class="sound-modal" aria-hidden="true">
+    <div class="sound-modal-backdrop"></div>
+    <div id="soundModalCard" class="sound-modal-card">
+      <div id="soundModalDrag" class="sound-modal-top">
+        <div class="sound-modal-title">Послушать саундтрек «Волны любви»</div>
+        <button id="closeSoundBtn" class="sound-close" type="button" aria-label="Закрыть">×</button>
+      </div>
+      <div class="sound-controls">
+        <div class="playlist-block">
+          <audio id="soundtrack" controls preload="metadata"></audio>
+          <div class="playlist-ui">
+            <div class="playlist-label">Список воспроизведения</div>
+            <div class="playlist-items" id="playlistItems">
+              <button class="playlist-item active" type="button" data-src="../assets/audio/soundtrack.mp3" data-fallback="../assets/audio/soundtrack.wav">Волны любви</button>
+              <button class="playlist-item" type="button" data-src="../assets/audio/la-lluvia.mp3">Дождь</button>
+            </div>
+          </div>
+        </div>
+        <div class="spectrum-wrap">
+          <canvas id="spectrumCanvas" class="spectrum-canvas"></canvas>
+        </div>
+        <p class="sound-hint">Окно можно перетащить. Плеер запоминает дорожку и позицию между страницами.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/waves-player.js"></script>
+
 </body>
 </html>
